@@ -17,66 +17,68 @@ uvec3 u = uvec3(1, 2, 3); // シフト数
 
 // 引数・戻り値が2次元のuint型ハッシュ関数
 uvec2 uhash22(uvec2 n) {
-    n ^= (n.yx << u.xy);
-    n ^= (n.yx >> u.xy);
-    n *= k.xy;
-    n ^= (n.yx << u.xy);
-    return n * k.xy;
+  n ^= n.yx << u.xy;
+  n ^= n.yx >> u.xy;
+  n *= k.xy;
+  n ^= n.yx << u.xy;
+  return n * k.xy;
 }
 
 // 引数・戻り値が2次元のuint型ハッシュ関数
 uvec3 uhash33(uvec3 n) {
-    n ^= (n.yzx << u);
-    n ^= (n.yzx >> u);
-    n *= k;
-    n ^= (n.yzx << u);
-    return n * k;
+  n ^= n.yzx << u;
+  n ^= n.yzx >> u;
+  n *= k;
+  n ^= n.yzx << u;
+  return n * k;
 }
 
 // 引数・戻り値が2次元のfloat型ハッシュ関数
 vec2 hash22(vec2 p) {
-    uvec2 n = floatBitsToUint(p);
-    return vec2(uhash22(n)) / vec2(UINT_MAX);
+  uvec2 n = floatBitsToUint(p);
+  return vec2(uhash22(n)) / vec2(UINT_MAX);
 }
 
 // 引数・戻り値が3次元のfloat型ハッシュ関数
 vec3 hash33(vec3 p) {
-    uvec3 n = floatBitsToUint(p);
-    return vec3(uhash33(n)) / vec3(UINT_MAX);
+  uvec3 n = floatBitsToUint(p);
+  return vec3(uhash33(n)) / vec3(UINT_MAX);
 }
 
 // 引数が2次元、戻り値が1次元のfloat型ハッシュ関数
 float hash21(vec2 p) {
-    uvec2 n = floatBitsToUint(p);
-    return float(uhash22(n).x) / float(UINT_MAX);
-    // 注：1次元ハッシュ関数をネストする方法
-    // return float(uhash11(n.x+uhash11(n.y))) / float(UINT_MAX);
+  uvec2 n = floatBitsToUint(p);
+  return float(uhash22(n).x) / float(UINT_MAX);
+  // 注：1次元ハッシュ関数をネストする方法
+  // return float(uhash11(n.x+uhash11(n.y))) / float(UINT_MAX);
 }
 
 // 引数が3次元、戻り値が1次元のfloat型ハッシュ関数
 float hash31(vec3 p) {
-    uvec3 n = floatBitsToUint(p);
-    return float(uhash33(n).x) / float(UINT_MAX);
-    // 注：1次元ハッシュ関数をネストする方法
-    // return float(uhash11(n.x+uhash11(n.y+uhash11(n.z)))) / float(UINT_MAX);
+  uvec3 n = floatBitsToUint(p);
+  return float(uhash33(n).x) / float(UINT_MAX);
+  // 注：1次元ハッシュ関数をネストする方法
+  // return float(uhash11(n.x+uhash11(n.y+uhash11(n.z)))) / float(UINT_MAX);
 }
 
 void main() {
-    float time = floor(60.* u_time);
-    vec2 pos = gl_FragCoord.xy + time;
-    channel = ivec2(gl_FragCoord.xy * 2.0 / u_resolution.xy);
-    if (channel[0] == 0) { // 左
-        if (channel[1] == 0) {
-            fragColor.rgb = vec3(hash21(pos));
-        } else {
-            fragColor.rgb = vec3(hash22(pos), 1.0);
-        }
-    } else { // 右
-        if (channel[1] == 0) {
-            fragColor.rgb = vec3(hash31(vec3(pos, time)));
-        } else {
-            fragColor.rgb = hash33(vec3(pos, time));
-        }
+  float time = floor(60.0 * u_time);
+  vec2 pos = gl_FragCoord.xy + time;
+  channel = ivec2(gl_FragCoord.xy * 2.0 / u_resolution.xy);
+  if (channel[0] == 0) {
+    // 左
+    if (channel[1] == 0) {
+      fragColor.rgb = vec3(hash21(pos));
+    } else {
+      fragColor.rgb = vec3(hash22(pos), 1.0);
     }
-    fragColor.a = 1.0;
+  } else {
+    // 右
+    if (channel[1] == 0) {
+      fragColor.rgb = vec3(hash31(vec3(pos, time)));
+    } else {
+      fragColor.rgb = hash33(vec3(pos, time));
+    }
+  }
+  fragColor.a = 1.0;
 }

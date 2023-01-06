@@ -1,0 +1,21 @@
+{
+  "name": "math-of-real-time-graphics",
+  "version": "0.0.0",
+  "scripts": {
+    "fmt": "prettier --write shaders/**/*.frag"
+  },
+  "prettier": {
+    "overrides":[
+      {
+        "files": ["*.frag"],
+        "options": {
+          "parser": "glsl-parser"
+        }
+      }
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^2.8.1",
+    "prettier-plugin-glsl": "^0.0.8"
+  }
+}
